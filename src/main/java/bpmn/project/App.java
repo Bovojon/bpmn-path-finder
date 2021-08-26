@@ -60,7 +60,7 @@ public class App {
           path.add(0, tempStartID);
           tempEndID = tempStartID;
         }
-        System.out.println("The path from approveInvoice to invoiceProcessed is:");
+        System.out.printf("The path from %s to %s is:\n", startID, endID);
         System.out.println(path);
         return;
       }
