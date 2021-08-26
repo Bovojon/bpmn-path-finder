@@ -21,7 +21,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.camunda.bpm.model.bpmn.instance.FlowNode;
 
-class Foo {
+class ResponseObject {
   public String id;
   public String bpmn20Xml;
 }
@@ -37,23 +37,20 @@ public class App {
             .uri(URI.create(url))
             .GET()
             .build();
-
     HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
     Gson gson = new Gson();
-    Foo obj = gson.fromJson(response.body(), Foo.class);
+    ResponseObject obj = gson.fromJson(response.body(), ResponseObject.class);
     InputStream stream = new ByteArrayInputStream(obj.bpmn20Xml.getBytes(Charset.forName("UTF-8")));
     BpmnModelInstance modelInstance = Bpmn.readModelFromStream(stream);
     FlowNode startNode = (FlowNode) modelInstance.getModelElementById(startID);
     List<String> path = new ArrayList<>();
-
     Map<String, Boolean> visited = new HashMap<>();
     Map<String, String> backtracking = new HashMap<>();
-    Queue<FlowNode> q = new ArrayDeque<>();
+    Queue<FlowNode> bfsQ = new ArrayDeque<>();
     visited.put(startID, true);
-    q.add(startNode);
-    
-    while(!q.isEmpty()) {
-      FlowNode node = q.remove();
+    bfsQ.add(startNode);
+    while(!bfsQ.isEmpty()) {
+      FlowNode node = bfsQ.remove();
       if (node.getId().equals(endID)) {
         String tempStartID = "";
         String tempEndID = endID;
@@ -73,7 +70,7 @@ public class App {
         backtracking.put(adjacentNode.getId(), node.getId());
         if (visited.get(adjacentNode.getId()) == null || !visited.get(adjacentNode.getId())) {
           visited.put(adjacentNode.getId(), true);
-          q.add(adjacentNode);
+          bfsQ.add(adjacentNode);
         }
       }
     }
