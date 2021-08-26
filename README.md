@@ -1,1 +1,1 @@
-# bpmn-path-finder
+# BPMN Path Finder
